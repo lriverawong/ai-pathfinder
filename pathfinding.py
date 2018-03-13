@@ -1,5 +1,6 @@
 import copy
 import math
+import random
 
 def main():
     print('=========== START ===========')
@@ -13,7 +14,9 @@ def main():
     g_loc = target_finder(grid, 'G')
     print(g_loc)
 
-    return_grid = greedy(grid, s_loc, g_loc)
+    return_grid = False
+    while(not(return_grid)):
+        return_grid = greedy(grid, s_loc, g_loc)
     print(return_grid)
     writer(output_filename, return_grid)
 
@@ -53,6 +56,7 @@ def target_finder(grid, target):
 def greedy(tmp_grid, s_loc, g_loc):
     a_grid = copy.deepcopy(tmp_grid)
     curr_loc = s_loc
+    prev_dir = "None"
     stuck = False
     while (not(stuck)):
         left_dist = math.inf
@@ -95,23 +99,46 @@ def greedy(tmp_grid, s_loc, g_loc):
 
         if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
             stuck = True
+            return False
 
         if (not(stuck)):
             # TODO: Improve the checking for None values before min check
-            min_dist = min(up_dist, down_dist, left_dist, right_dist)
-            if (left_dist == min_dist):
+            min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist])#min(up_dist, down_dist, left_dist, right_dist)
+            print("Previous direction was %s" % prev_dir)
+            if(prev_dir == "Down" and min_index == 0):
+                return False 
+            if(prev_dir == "Up" and min_index == 1):
+                return False 
+            if(prev_dir == "Right" and min_index == 2):
+                return False 
+            if(prev_dir == "Left" and min_index == 3):
+                return False 
+
+            if (min_index == 2):
+                if (prev_dir == "Right"):
+                    return False
+                prev_dir = "Left"
                 curr_loc[1] -= 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 print('left')
-            elif (right_dist == min_dist):
+            elif (min_index == 3):
+                if (prev_dir == "Left"):
+                    return False
+                prev_dir = "Right"
                 curr_loc[1] += 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 print('right')
-            elif (up_dist == min_dist):
+            elif (min_index == 0):
+                if (prev_dir == "Down"):
+                    return False
+                prev_dir = "Up"
                 curr_loc[0] -= 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 print('up')
-            elif (down_dist == min_dist):
+            elif (min_index == 1):
+                if (prev_dir == "Up"):
+                    return False
+                prev_dir = "Down"
                 curr_loc[0] += 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 print('down')
