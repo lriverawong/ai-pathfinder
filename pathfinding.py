@@ -1,4 +1,5 @@
 import copy
+import math
 
 def main():
     print('=========== START ===========')
@@ -54,10 +55,10 @@ def greedy(tmp_grid, s_loc, g_loc):
     curr_loc = s_loc
     stuck = False
     while (not(stuck)):
-        left_dist = None
-        right_dist = None
-        up_dist = None
-        down_dist = None
+        left_dist = math.inf
+        right_dist = math.inf
+        up_dist = math.inf
+        down_dist = math.inf
         # Left distance
         if ((curr_loc[1] - 1) >= 0):
             if(a_grid[curr_loc[0]][curr_loc[1] - 1] == 'G'):
@@ -92,7 +93,7 @@ def greedy(tmp_grid, s_loc, g_loc):
                 print("down_dist = ", down_dist)
         
 
-        if (left_dist == None and right_dist == None and up_dist == None and down_dist == None):
+        if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
             stuck = True
 
         if (not(stuck)):
@@ -115,7 +116,15 @@ def greedy(tmp_grid, s_loc, g_loc):
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 print('down')
 
+def randomMinIndex(array):
+    minValue = min(array)
+    minIndices = []
 
+    for i in range(len(array)):
+        if(array[i] == minValue):
+            minIndices.append(i)
+            
+    return minIndices[random.randint(0,len(minIndices) - 1)]
 
 
 main()
