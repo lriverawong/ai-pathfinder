@@ -1,6 +1,7 @@
 import copy
 import math
 import random
+from heapq import heappush, heappop
 
 def main():
     print('=========== START ===========')
@@ -10,16 +11,20 @@ def main():
     output_filename = 'output.txt'
 
     s_loc = target_finder(grid, 'S')
-    print(s_loc)
+    print("Starting location: ", s_loc)
     g_loc = target_finder(grid, 'G')
-    print(g_loc)
+    print("Goal location: ", g_loc)
 
-    return_grid = False
-    while(not(return_grid)):
-        return_grid = greedy(grid, s_loc, g_loc)
-    print(return_grid)
+    # return_grid = False
+    # while(not(return_grid)):
+    #     return_grid = greedy(grid, s_loc, g_loc)
+
+    # print(return_grid)
+    # writer(output_filename, return_grid)
+
+    return_grid = a_star_b(grid, s_loc, g_loc)
+    #print(return_grid)
     writer(output_filename, return_grid)
-
 
     print('=========== END ============')
     
@@ -52,13 +57,225 @@ def target_finder(grid, target):
                 location.append(j)
     return location
 
-# uses manhattan distance
-def greedy(tmp_grid, s_loc, g_loc):
+def manhattan(a, b):
+    return abs( a[0] - b[0] ) + abs( a[1] - b[1] )
+
+def cheb(a, b):
+    return max( abs( a[0] - b[0] ), abs( a[1] - b[1] ) )
+
+# def getPath(nodes):
+#     path = []
+#     next = heappop(nodes)
+
+#     while(next[2] != None):
+
+
+#     return []
+def printMatrix(matrix):
+    print("\n")
+    for x in matrix:
+        print(x)
+
+def a_star_b(tmp_grid, s_loc, g_loc):
     a_grid = copy.deepcopy(tmp_grid)
-    curr_loc = s_loc
+    came_from = [[None for j in range(len(a_grid[0]))] for i in range(len(a_grid))]
+    cost = [[None for j in range(len(a_grid[0]))] for i in range(len(a_grid))]
+
+    cost[s_loc[0]][s_loc[1]] = 0
+
+    curr_loc = None #copy.deepcopy(s_loc)
+    foundGoal = False
+    visited = []
+
+    heappush(visited, (cheb(s_loc, g_loc), s_loc))
+
+    #Find the goal
+    while(not(foundGoal)):
+        curr_node = heappop(visited)
+        curr_loc = curr_node[1]
+
+        if(a_grid[curr_loc[0]][curr_loc[1]] == 'G'):
+            foundGoal = True
+
+        if(not(foundGoal)):
+            #Left
+            if(curr_loc[1] - 1 >= 0):
+                if(a_grid[curr_loc[0]][curr_loc[1] - 1] == '_' or a_grid[curr_loc[0]][curr_loc[1] - 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0]][curr_loc[1] - 1] == None  or cost_so_far + 1 < cost[curr_loc[0]][curr_loc[1] - 1]):
+                        cost[curr_loc[0]][curr_loc[1] - 1] = cost_so_far + 1
+                        came_from[curr_loc[0]][curr_loc[1] - 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0], curr_loc[1] - 1], g_loc), [curr_loc[0], curr_loc[1] - 1]))
+
+            #Right
+            if(curr_loc[1] + 1 < len(a_grid[0])):
+                if(a_grid[curr_loc[0]][curr_loc[1] + 1] == '_' or a_grid[curr_loc[0]][curr_loc[1] + 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0]][curr_loc[1] + 1] == None  or cost_so_far + 1 < cost[curr_loc[0]][curr_loc[1] + 1]):
+                        cost[curr_loc[0]][curr_loc[1] + 1] = cost_so_far + 1
+                        came_from[curr_loc[0]][curr_loc[1] + 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0], curr_loc[1] + 1], g_loc), [curr_loc[0], curr_loc[1] + 1]))
+           
+            #Up
+            if(curr_loc[0] - 1 >= 0):
+                if(a_grid[curr_loc[0] - 1][curr_loc[1]] == '_' or a_grid[curr_loc[0] - 1][curr_loc[1]] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] - 1][curr_loc[1]] == None  or cost_so_far + 1 < cost[curr_loc[0] - 1][curr_loc[1]]):
+                        cost[curr_loc[0] - 1][curr_loc[1]] = cost_so_far + 1
+                        came_from[curr_loc[0] - 1][curr_loc[1]] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] - 1, curr_loc[1]], g_loc), [curr_loc[0] - 1, curr_loc[1]]))
+
+            #Down
+            if(curr_loc[0] + 1 < len(a_grid)):
+                if(a_grid[curr_loc[0] + 1][curr_loc[1]] == '_' or a_grid[curr_loc[0] + 1][curr_loc[1]] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] + 1][curr_loc[1]] == None  or cost_so_far + 1 < cost[curr_loc[0] + 1][curr_loc[1]]):
+                        cost[curr_loc[0] + 1][curr_loc[1]] = cost_so_far + 1
+                        came_from[curr_loc[0] + 1][curr_loc[1]] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] + 1, curr_loc[1]], g_loc), [curr_loc[0] + 1, curr_loc[1]]))
+
+            #Up Left
+            if(curr_loc[0] - 1 >= 0 and curr_loc[1] - 1 >= 0):
+                if(a_grid[curr_loc[0] - 1][curr_loc[1] - 1] == '_' or a_grid[curr_loc[0] - 1][curr_loc[1] - 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] - 1][curr_loc[1] - 1] == None  or cost_so_far + 1 < cost[curr_loc[0] - 1][curr_loc[1] - 1]):
+                        cost[curr_loc[0] - 1][curr_loc[1] - 1] = cost_so_far + 1
+                        came_from[curr_loc[0] - 1][curr_loc[1] - 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] - 1, curr_loc[1] - 1], g_loc), [curr_loc[0] - 1, curr_loc[1] - 1]))
+
+            #Up Right
+            if(curr_loc[0] - 1 and curr_loc[1] + 1 < len(a_grid[0])):
+                if(a_grid[curr_loc[0] - 1][curr_loc[1] + 1] == '_' or a_grid[curr_loc[0] - 1][curr_loc[1] + 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] - 1][curr_loc[1] + 1] == None  or cost_so_far + 1 < cost[curr_loc[0] - 1][curr_loc[1] + 1]):
+                        cost[curr_loc[0] - 1][curr_loc[1] + 1] = cost_so_far + 1
+                        came_from[curr_loc[0] - 1][curr_loc[1] + 1] = [curr_loc[0] - 1, curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] - 1, curr_loc[1] + 1], g_loc), [curr_loc[0] - 1, curr_loc[1] + 1]))
+           
+            #Down Left
+            if(curr_loc[0] + 1 < len(a_grid) and curr_loc[1] - 1 >= 0):
+                if(a_grid[curr_loc[0] + 1][curr_loc[1] - 1] == '_' or a_grid[curr_loc[0] + 1][curr_loc[1] - 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] + 1][curr_loc[1] - 1] == None  or cost_so_far + 1 < cost[curr_loc[0] + 1][curr_loc[1] - 1]):
+                        cost[curr_loc[0] + 1][curr_loc[1] - 1] = cost_so_far + 1
+                        came_from[curr_loc[0] + 1][curr_loc[1] - 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] + 1, curr_loc[1] - 1], g_loc), [curr_loc[0] + 1, curr_loc[1] - 1]))
+
+            #Down Right
+            if(curr_loc[0] + 1 < len(a_grid) and curr_loc[1] + 1 < len(a_grid[0])):
+                if(a_grid[curr_loc[0] + 1][curr_loc[1] + 1] == '_' or a_grid[curr_loc[0] + 1][curr_loc[1] + 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] + 1][curr_loc[1] + 1] == None  or cost_so_far + 1 < cost[curr_loc[0] + 1][curr_loc[1] + 1]):
+                        cost[curr_loc[0] + 1][curr_loc[1] + 1] = cost_so_far + 1
+                        came_from[curr_loc[0] + 1][curr_loc[1] + 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + cheb([curr_loc[0] + 1, curr_loc[1] + 1], g_loc), [curr_loc[0] + 1, curr_loc[1] + 1]))
+
+    while(came_from[curr_loc[0]][curr_loc[1]] != None):
+        curr_loc = came_from[curr_loc[0]][curr_loc[1]]
+        if(a_grid[curr_loc[0]][curr_loc[1]] != 'S'):
+            a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+
+    return a_grid
+
+def a_star_a(tmp_grid, s_loc, g_loc):
+    a_grid = copy.deepcopy(tmp_grid)
+    came_from = [[None for j in range(len(a_grid[0]))] for i in range(len(a_grid))]
+    cost = [[None for j in range(len(a_grid[0]))] for i in range(len(a_grid))]
+
+    cost[s_loc[0]][s_loc[1]] = 0
+
+    curr_loc = None #copy.deepcopy(s_loc)
+    foundGoal = False
+    visited = []
+
+    heappush(visited, (manhattan(s_loc, g_loc), s_loc))
+
+    #Find the goal
+    while(not(foundGoal)):
+        curr_node = heappop(visited)
+        curr_loc = curr_node[1]
+
+        if(a_grid[curr_loc[0]][curr_loc[1]] == 'G'):
+            foundGoal = True
+
+        if(not(foundGoal)):
+            #Left
+            if(curr_loc[1] - 1 >= 0):
+                if(a_grid[curr_loc[0]][curr_loc[1] - 1] == '_' or a_grid[curr_loc[0]][curr_loc[1] - 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0]][curr_loc[1] - 1] == None  or cost_so_far + 1 < cost[curr_loc[0]][curr_loc[1] - 1]):
+                        cost[curr_loc[0]][curr_loc[1] - 1] = cost_so_far + 1
+                        came_from[curr_loc[0]][curr_loc[1] - 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + manhattan([curr_loc[0], curr_loc[1] - 1], g_loc), [curr_loc[0], curr_loc[1] - 1]))
+
+            #Right
+            if(curr_loc[1] + 1 < len(a_grid[0])):
+                if(a_grid[curr_loc[0]][curr_loc[1] + 1] == '_' or a_grid[curr_loc[0]][curr_loc[1] + 1] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0]][curr_loc[1] + 1] == None  or cost_so_far + 1 < cost[curr_loc[0]][curr_loc[1] + 1]):
+                        cost[curr_loc[0]][curr_loc[1] + 1] = cost_so_far + 1
+                        came_from[curr_loc[0]][curr_loc[1] + 1] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + manhattan([curr_loc[0], curr_loc[1] + 1], g_loc), [curr_loc[0], curr_loc[1] + 1]))
+           
+            #Up
+            if(curr_loc[0] - 1 >= 0):
+                if(a_grid[curr_loc[0] - 1][curr_loc[1]] == '_' or a_grid[curr_loc[0] - 1][curr_loc[1]] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] - 1][curr_loc[1]] == None  or cost_so_far + 1 < cost[curr_loc[0] - 1][curr_loc[1]]):
+                        cost[curr_loc[0] - 1][curr_loc[1]] = cost_so_far + 1
+                        came_from[curr_loc[0] - 1][curr_loc[1]] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + manhattan([curr_loc[0] - 1, curr_loc[1]], g_loc), [curr_loc[0] - 1, curr_loc[1]]))
+
+            #Down
+            if(curr_loc[0] + 1 < len(a_grid)):
+                if(a_grid[curr_loc[0] + 1][curr_loc[1]] == '_' or a_grid[curr_loc[0] + 1][curr_loc[1]] == 'G'):
+                    cost_so_far = cost[curr_loc[0]][curr_loc[1]]
+
+
+                    if(cost[curr_loc[0] + 1][curr_loc[1]] == None  or cost_so_far + 1 < cost[curr_loc[0] + 1][curr_loc[1]]):
+                        cost[curr_loc[0] + 1][curr_loc[1]] = cost_so_far + 1
+                        came_from[curr_loc[0] + 1][curr_loc[1]] = [curr_loc[0], curr_loc[1]]
+                        heappush(visited, (cost_so_far + 1 + manhattan([curr_loc[0] + 1, curr_loc[1]], g_loc), [curr_loc[0] + 1, curr_loc[1]]))
+
+    while(came_from[curr_loc[0]][curr_loc[1]] != None):
+        curr_loc = came_from[curr_loc[0]][curr_loc[1]]
+        if(a_grid[curr_loc[0]][curr_loc[1]] != 'S'):
+            a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+
+    return a_grid
+
+# uses manhattan distance
+def greedy_a(tmp_grid, s_loc, g_loc):
+    a_grid = copy.deepcopy(tmp_grid)
+    curr_loc = copy.deepcopy(s_loc)
     prev_dir = "None"
     stuck = False
     while (not(stuck)):
+        print("\n")
+        for x in a_grid:
+            print(''.join(x))
         left_dist = math.inf
         right_dist = math.inf
         up_dist = math.inf
@@ -70,7 +287,7 @@ def greedy(tmp_grid, s_loc, g_loc):
             if(a_grid[curr_loc[0]][curr_loc[1] - 1] == '_'):
                 # left_dist = (row_diff + col_diff)
                 left_dist = (g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]-1))
-                print("left_dist = ", left_dist)
+                #print("left_dist = ", left_dist)
         # Right distance
         if ((curr_loc[1] + 1) < len(a_grid[0])):
             if(a_grid[curr_loc[0]][curr_loc[1] + 1] == 'G'):
@@ -78,7 +295,7 @@ def greedy(tmp_grid, s_loc, g_loc):
             if(a_grid[curr_loc[0]][curr_loc[1] + 1] == '_'):
                 # right_dist = (row_diff + col_diff)
                 right_dist = (g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]+1))
-                print("right_dist = ", right_dist)
+                #print("right_dist = ", right_dist)
         # Up distance
         if ((curr_loc[0] - 1) >= 0):
             if(a_grid[(curr_loc[0]-1)][curr_loc[1]] == 'G'):
@@ -86,7 +303,7 @@ def greedy(tmp_grid, s_loc, g_loc):
             if(a_grid[(curr_loc[0]-1)][curr_loc[1]] == '_'):
                 # up_dist = (row_diff + col_diff)
                 up_dist = (g_loc[0] - (curr_loc[0]-1)) + (g_loc[1] - curr_loc[1])
-                print("up_dist = ", up_dist)
+                #print("up_dist = ", up_dist)
         # Down distance
         if ((curr_loc[0] + 1) < len(a_grid)):
             if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == 'G'):
@@ -94,7 +311,7 @@ def greedy(tmp_grid, s_loc, g_loc):
             if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == '_'):
                 # down_dist = (row_diff + col_diff)
                 down_dist = (g_loc[0] - (curr_loc[0]+1)) + (g_loc[1] - curr_loc[1])
-                print("down_dist = ", down_dist)
+                #print("down_dist = ", down_dist)
         
 
         if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
@@ -104,7 +321,7 @@ def greedy(tmp_grid, s_loc, g_loc):
         if (not(stuck)):
             # TODO: Improve the checking for None values before min check
             min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist])#min(up_dist, down_dist, left_dist, right_dist)
-            print("Previous direction was %s" % prev_dir)
+            #print("Previous direction was %s" % prev_dir)
             if(prev_dir == "Down" and min_index == 0):
                 return False 
             if(prev_dir == "Up" and min_index == 1):
@@ -120,28 +337,28 @@ def greedy(tmp_grid, s_loc, g_loc):
                 prev_dir = "Left"
                 curr_loc[1] -= 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
-                print('left')
+                #print('left')
             elif (min_index == 3):
                 if (prev_dir == "Left"):
                     return False
                 prev_dir = "Right"
                 curr_loc[1] += 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
-                print('right')
+                #print('right')
             elif (min_index == 0):
                 if (prev_dir == "Down"):
                     return False
                 prev_dir = "Up"
                 curr_loc[0] -= 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
-                print('up')
+                #print('up')
             elif (min_index == 1):
                 if (prev_dir == "Up"):
                     return False
                 prev_dir = "Down"
                 curr_loc[0] += 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
-                print('down')
+                #print('down')
 
 def randomMinIndex(array):
     minValue = min(array)
