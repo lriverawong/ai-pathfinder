@@ -1,3 +1,4 @@
+import re
 import copy
 import math
 import random
@@ -5,26 +6,26 @@ from heapq import heappush, heappop
 
 def main():
     print('=========== START ===========')
-    filename = 'pathfinding_a.txt'
-    grid = reader(filename)
-    # print(grid)
-    output_filename = 'output.txt'
+    
+    ####################################
+    # Part 1
+    #####################################
+    # filename = 'pathfinding_a.txt'
+    # grid = reader(filename)
+    # output_filename = 'output.txt'
 
-    s_loc = target_finder(grid, 'S')
-    print("Starting location: ", s_loc)
-    g_loc = target_finder(grid, 'G')
-    print("Goal location: ", g_loc)
+    # s_loc = target_finder(grid, 'S')
+    # print("Starting location: ", s_loc)
+    # g_loc = target_finder(grid, 'G')
+    # print("Goal location: ", g_loc)
 
-    # return_grid = False
-    # while(not(return_grid)):
-    #     return_grid = greedy(grid, s_loc, g_loc)
-
-    # print(return_grid)
+    # return_grid = a_star_b(grid, s_loc, g_loc)
+    # #print(return_grid)
     # writer(output_filename, return_grid)
+    #####################################
 
-    return_grid = a_star_b(grid, s_loc, g_loc)
-    #print(return_grid)
-    writer(output_filename, return_grid)
+    # Part 2
+    alphabeta()
 
     print('=========== END ============')
     
@@ -63,14 +64,6 @@ def manhattan(a, b):
 def cheb(a, b):
     return max( abs( a[0] - b[0] ), abs( a[1] - b[1] ) )
 
-# def getPath(nodes):
-#     path = []
-#     next = heappop(nodes)
-
-#     while(next[2] != None):
-
-
-#     return []
 def printMatrix(matrix):
     print("\n")
     for x in matrix:
@@ -369,6 +362,88 @@ def randomMinIndex(array):
             minIndices.append(i)
             
     return minIndices[random.randint(0,len(minIndices) - 1)]
+
+
+def alphabeta():
+    input_filename = "alphabeta.txt"
+    output_filename = "alphabeta_out.txt"
+    alphabeta_reader(input_filename)
+
+
+def alphabeta_reader(input_filename):
+    temp_base = {}
+    with open(input_filename) as f:
+        for i in f.readlines():
+            if (not(i[0] == " ")):
+                temp_input01 = i.split(' ')
+                print(temp_input01)
+                t_part01 = temp_input01[0]
+                t_part01 = t_part01[2:-2].split('),(')
+                print(t_part01)
+                t_part02 = temp_input01[1]
+                t_part02 = t_part02[2:-2].split('),(')
+                print(t_part02)
+                
+                # building base
+                for j in t_part01:
+                    t_node = j.split(',')
+                    t_letter = t_node[0]
+                    print(t_letter)
+                    t_minmax_letter = t_node[1][1] == 'I'
+                    print(t_minmax_letter)
+                    temp_node = Node(t_letter, t_minmax_letter)
+                    temp_base[t_letter] = temp_node
+                    print("testing the dic = ", temp_base[t_letter].min)
+                
+                # building children
+                for k in t_part02:
+                    t_node = k.split(',')
+                    t_fletter = t_node[0]
+                    print(t_fletter)
+                    t_sletter = t_node[1]
+                    print(t_sletter)
+                    some_node = temp_base[t_fletter]
+                    if (t_sletter in temp_base):
+                        print(temp_base[t_sletter])
+                        some_node.childrenSetter(temp_base[t_sletter])
+                    else:
+                        # assume that its numeric
+                        some_node.valueSetter(int(t_sletter))
+
+                
+    for x in temp_base:
+        print('----------')
+        print("Letter = ", temp_base[x].letter)
+        print("Min Bool = ", temp_base[x].min)
+        print("Value length = ", len(temp_base[x].values))
+        print("Values: ")
+        for y in temp_base[x].values:
+            print("\t", y)
+        print("Children length = ", len(temp_base[x].children))
+                
+
+
+class Node:
+    node_count = 0
+
+    def __init__(self, letter, minmax, value=-1):
+        self.letter = letter
+        self.min = minmax
+        self.values = []
+        self.children = []
+        Node.node_count += 1
+    
+    def valueSetter(self, value):
+        self.values.append(value)
+    
+    def childrenSetter(self, value):
+        self.children.append(value)
+
+    def displayCount(self):
+     print ("Total Nodes = %d" % Node.node_count)
+
+    def displayNode(self):
+      print ("letter: ", self.letter,", minmax: ", self.minmax, " value: ", self.value)
 
 
 main()
