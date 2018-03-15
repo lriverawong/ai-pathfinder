@@ -22,7 +22,7 @@ def main():
     # print(return_grid)
     # writer(output_filename, return_grid)
 
-    return_grid = a_star_b(grid, s_loc, g_loc)
+    return_grid = greedy_b(grid, s_loc, g_loc)
     #print(return_grid)
     writer(output_filename, return_grid)
 
@@ -57,20 +57,16 @@ def target_finder(grid, target):
                 location.append(j)
     return location
 
+#Will be used to find the h values for up down left right searches
+#a - x/y of current
+#b - x/y of goal
 def manhattan(a, b):
     return abs( a[0] - b[0] ) + abs( a[1] - b[1] )
 
+#Will be used to find the h values for up down left right and diagonals
 def cheb(a, b):
     return max( abs( a[0] - b[0] ), abs( a[1] - b[1] ) )
 
-# def getPath(nodes):
-#     path = []
-#     next = heappop(nodes)
-
-#     while(next[2] != None):
-
-
-#     return []
 def printMatrix(matrix):
     print("\n")
     for x in matrix:
@@ -266,7 +262,7 @@ def a_star_a(tmp_grid, s_loc, g_loc):
 
     return a_grid
 
-# uses manhattan distance
+# uses manhattan distance (up down left right solution)
 def greedy_a(tmp_grid, s_loc, g_loc):
     a_grid = copy.deepcopy(tmp_grid)
     curr_loc = copy.deepcopy(s_loc)
@@ -285,16 +281,14 @@ def greedy_a(tmp_grid, s_loc, g_loc):
             if(a_grid[curr_loc[0]][curr_loc[1] - 1] == 'G'):
                 return a_grid
             if(a_grid[curr_loc[0]][curr_loc[1] - 1] == '_'):
-                # left_dist = (row_diff + col_diff)
-                left_dist = (g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]-1))
-                #print("left_dist = ", left_dist)
+                left_dist = manhattan([curr_loc[0],(curr_loc[1]-1)],g_loc) #(g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]-1))
         # Right distance
         if ((curr_loc[1] + 1) < len(a_grid[0])):
             if(a_grid[curr_loc[0]][curr_loc[1] + 1] == 'G'):
                 return a_grid
             if(a_grid[curr_loc[0]][curr_loc[1] + 1] == '_'):
                 # right_dist = (row_diff + col_diff)
-                right_dist = (g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]+1))
+                right_dist = manhattan([curr_loc[0],(curr_loc[1]+1)],g_loc)#(g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]+1))
                 #print("right_dist = ", right_dist)
         # Up distance
         if ((curr_loc[0] - 1) >= 0):
@@ -302,7 +296,7 @@ def greedy_a(tmp_grid, s_loc, g_loc):
                 return a_grid
             if(a_grid[(curr_loc[0]-1)][curr_loc[1]] == '_'):
                 # up_dist = (row_diff + col_diff)
-                up_dist = (g_loc[0] - (curr_loc[0]-1)) + (g_loc[1] - curr_loc[1])
+                up_dist = manhattan([(curr_loc[0]-1),curr_loc[1]],g_loc)#(g_loc[0] - (curr_loc[0]-1)) + (g_loc[1] - curr_loc[1])
                 #print("up_dist = ", up_dist)
         # Down distance
         if ((curr_loc[0] + 1) < len(a_grid)):
@@ -310,7 +304,7 @@ def greedy_a(tmp_grid, s_loc, g_loc):
                 return a_grid
             if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == '_'):
                 # down_dist = (row_diff + col_diff)
-                down_dist = (g_loc[0] - (curr_loc[0]+1)) + (g_loc[1] - curr_loc[1])
+                down_dist = manhattan([(curr_loc[0]+1),curr_loc[1]],g_loc) #(g_loc[0] - (curr_loc[0]+1)) + (g_loc[1] - curr_loc[1])
                 #print("down_dist = ", down_dist)
         
 
@@ -359,6 +353,156 @@ def greedy_a(tmp_grid, s_loc, g_loc):
                 curr_loc[0] += 1
                 a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 #print('down')
+
+# uses cheb distance (up down left right diagonal solution)
+def greedy_b(tmp_grid, s_loc, g_loc):
+    a_grid = copy.deepcopy(tmp_grid)
+    curr_loc = copy.deepcopy(s_loc)
+    prev_dir = "None"
+    stuck = False
+    while (not(stuck)):
+        print("\n")
+        for x in a_grid:
+            print(''.join(x))
+        left_dist = math.inf
+        right_dist = math.inf
+        up_dist = math.inf
+        down_dist = math.inf
+        up_right_dist = math.inf
+        up_left_dist = math.inf
+        down_right_dist = math.inf
+        down_left_dist = math.inf
+        #################################################################
+        #Get the H values for all the directions.
+        #################################################################
+        # Left distance
+        if ((curr_loc[1] - 1) >= 0):
+            if(a_grid[curr_loc[0]][curr_loc[1] - 1] == 'G'):
+                return a_grid
+            if(a_grid[curr_loc[0]][curr_loc[1] - 1] == '_'):
+                # left_dist = (row_diff + col_diff)
+                left_dist = cheb([curr_loc[0],(curr_loc[1]-1)],g_loc) #(g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]-1))
+                #print("left_dist = ", left_dist)
+        # Right distance
+        if ((curr_loc[1] + 1) < len(a_grid[0])):
+            if(a_grid[curr_loc[0]][curr_loc[1] + 1] == 'G'):
+                return a_grid
+            if(a_grid[curr_loc[0]][curr_loc[1] + 1] == '_'):
+                # right_dist = (row_diff + col_diff)
+                right_dist = cheb([curr_loc[0],(curr_loc[1]+1)],g_loc)#(g_loc[0] - curr_loc[0]) + (g_loc[1] - (curr_loc[1]+1))
+                #print("right_dist = ", right_dist)
+        # Up distance
+        if ((curr_loc[0] - 1) >= 0):
+            if(a_grid[(curr_loc[0]-1)][curr_loc[1]] == 'G'):
+                return a_grid
+            if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == '_'):
+                # up_dist = (row_diff + col_diff)
+                up_dist = cheb([(curr_loc[0]-1),curr_loc[1]],g_loc)#(g_loc[0] - (curr_loc[0]-1)) + (g_loc[1] - curr_loc[1])
+                #print("up_dist = ", up_dist)
+        # Down distance
+        if ((curr_loc[0] + 1) < len(a_grid)):
+            if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == 'G'):
+                return a_grid
+            if(a_grid[(curr_loc[0]+1)][curr_loc[1]] == '_'):
+                # down_dist = (row_diff + col_diff)
+                down_dist = cheb([(curr_loc[0]+1),curr_loc[1]],g_loc) #(g_loc[0] - (curr_loc[0]+1)) + (g_loc[1] - curr_loc[1])
+                #print("down_dist = ", down_dist)
+        #Up + Right (diagonal)
+        if (((curr_loc[0] - 1) >= 0) and ((curr_loc[1] + 1) < len(a_grid[0]))):
+        #                       up          right
+            if(a_grid[curr_loc[0]-1][curr_loc[1]+1] == 'G'):
+                return a_grid
+        #                       up          right   
+            if(a_grid[curr_loc[0]-1][curr_loc[1]+1] == '_'):
+                up_right_dist = cheb([(curr_loc[0]-1),(curr_loc[1]+1)],g_loc)
+
+        #Up + Left (diagonal)
+        if (((curr_loc[0] - 1) >= 0) and ((curr_loc[1] - 1) < len(a_grid[0]))):
+        #                       up          Left
+            if(a_grid[curr_loc[0]-1][curr_loc[1]-1] == 'G'):
+                return a_grid
+        #                       up          Left   
+            if(a_grid[curr_loc[0]-1][curr_loc[1]-1] == '_'):
+                up_left_dist = cheb([(curr_loc[0]-1),(curr_loc[1]-1)],g_loc)
+
+        #Down + Right (diagonal)
+        if (((curr_loc[0] + 1) >= 0) and ((curr_loc[1] + 1) < len(a_grid[0]))):
+        #                       Down          right
+            if(a_grid[curr_loc[0]+1][curr_loc[1]+1] == 'G'):
+                return a_grid
+        #                       Down          right   
+            if(a_grid[curr_loc[0]+1][curr_loc[1]+1] == '_'):
+                down_right_dist = cheb([(curr_loc[0]+1),(curr_loc[1]+1)],g_loc)
+
+        #Down + Left (diagonal)
+        if (((curr_loc[0] + 1) >= 0) and ((curr_loc[1] - 1) < len(a_grid[0]))):
+        #                       Down          Left
+            if(a_grid[curr_loc[0]+1][curr_loc[1]-1] == 'G'):
+                return a_grid
+        #                       Down          Left   
+            if(a_grid[curr_loc[0]+1][curr_loc[1]-1] == '_'):
+                down_left_dist = cheb([(curr_loc[0]+1),(curr_loc[1]-1)],g_loc)
+                
+
+        if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
+            stuck = True
+            return False
+
+        if (not(stuck)):
+            # TODO: Improve the checking for None values before min check
+            min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist, up_right_dist, up_left_dist, down_right_dist, down_left_dist])
+            #print("Previous direction was %s" % prev_dir)
+            if(prev_dir == "Down" and min_index == 0):
+                return False 
+            if(prev_dir == "Up" and min_index == 1):
+                return False 
+            if(prev_dir == "Right" and min_index == 2):
+                return False 
+            if(prev_dir == "Left" and min_index == 3):
+                return False 
+
+            #Diagonal Directions
+            if (min_index == 4):
+                curr_loc[0] -= 1
+                curr_loc[1] += 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('up_right')
+            elif (min_index == 5):
+                curr_loc[0] -= 1
+                curr_loc[1] -= 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('up_left')
+            elif (min_index == 6):
+                curr_loc[0] += 1
+                curr_loc[1] += 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('down_right')
+            elif (min_index == 7):
+                curr_loc[0] += 1
+                curr_loc[1] -= 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('down_left')
+
+            #Cardinal Directions
+            elif (min_index == 2):
+                curr_loc[1] -= 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('left')
+                
+            elif (min_index == 3):
+                curr_loc[1] += 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('right')
+            elif (min_index == 0):
+                curr_loc[0] -= 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('up')
+            elif (min_index == 1):
+                curr_loc[0] += 1
+                a_grid[curr_loc[0]][curr_loc[1]] = 'P'
+                #print('down')
+
+
 
 def randomMinIndex(array):
     minValue = min(array)
