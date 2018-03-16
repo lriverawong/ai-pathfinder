@@ -299,14 +299,14 @@ def greedy_a(tmp_grid, s_loc, g_loc):
                 if (a_grid[(curr_loc[0]+1)][curr_loc[1]] == 'G'):
                     return a_grid
                 if (a_grid[(curr_loc[0]+1)][curr_loc[1]] == '_'):
-                    down_dist = manhattan([(curr_loc[0]+1),curr_loc[1]],g_loc) #(g_loc[0] - (curr_loc[0]+1)) + (g_loc[1] - curr_loc[1])
+                    down_dist = manhattan([(curr_loc[0]+1),curr_loc[1]],g_loc)
 
             if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
                 stuck = True
                 return False
 
             if (not(stuck)):
-                min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist])#min(up_dist, down_dist, left_dist, right_dist)
+                min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist]
                 if (prev_dir == "Down" and min_index == 0):
                     return False 
                 if (prev_dir == "Up" and min_index == 1):
