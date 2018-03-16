@@ -11,15 +11,15 @@ def main():
     if (run_part01a):
         input_filename = 'pathfinding_a.txt'
         output_filename = 'pathfinding_a_out.txt'
-        total_reader(input_filename, output_filename)
+        reader(input_filename, output_filename)
     
     if (run_part01b):
         input_filename = 'pathfinding_b.txt'
         output_filename = 'pathfinding_b_out.txt'
-        total_reader(input_filename, output_filename)
+        reader(input_filename, output_filename)
 
 
-def total_reader(input_file, output_file):
+def reader(input_file, output_file):
     with open(input_file) as file:
         single_grid = []
         for line in file:
@@ -41,18 +41,6 @@ def total_reader(input_file, output_file):
         return_grid_a_star = a_star_a(single_grid, s_loc, g_loc)
         writer(output_file, 'Greedy', return_grid_greedy, 'A*', return_grid_a_star)
         single_grid = []
-
-
-def reader(filename):
-    return_grid = []
-    with open(filename) as f:
-        for i in f.readlines():
-            a_line = i.split()
-            a_list_first = a_line[0]
-            the_chars = list(a_list_first)
-            return_grid.append(the_chars)
-    return return_grid
-    
 
 def writer(filename, grid1_name, grid1, grid2_name, grid2):
     with open(filename, 'a+') as f:
