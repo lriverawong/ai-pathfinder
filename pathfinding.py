@@ -72,7 +72,6 @@ def manhattan(a, b):
 
 # Will be used to find the h values for up down left right and diagonals
 def cheb(a, b):
-
     return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
 
 
