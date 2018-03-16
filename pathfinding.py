@@ -19,30 +19,38 @@ def main():
         output_filename = 'pathfinding_a_out.txt'
 
         s_loc = target_finder(grid, 'S')
-        print("Starting location: ", s_loc)
+        # print("Starting location: ", s_loc)
         g_loc = target_finder(grid, 'G')
-        print("Goal location: ", g_loc)
+        # print("Goal location: ", g_loc)
 
-        return_grid = a_star_a(grid, s_loc, g_loc)
-        print_matrix(return_grid)
-        writer(output_filename, return_grid)
+        return_grid_greedy = greedy_a(grid, s_loc, g_loc)
+        # print_matrix(return_grid_greedy)
+
+        return_grid_a_star = a_star_a(grid, s_loc, g_loc)
+        # print_matrix(return_grid_s_star)
+
+        writer(output_filename, 'Greedy', return_grid_greedy, 'A*', return_grid_a_star)
     
     if (run_part01b):
-        filename = 'pathfinding_a.txt'
+        filename = 'pathfinding_b.txt'
         grid = reader(filename)
-        output_filename = 'pathfinding_a_out.txt'
+        output_filename = 'pathfinding_b_out.txt'
 
         s_loc = target_finder(grid, 'S')
-        print("Starting location: ", s_loc)
+        # print("Starting location: ", s_loc)
         g_loc = target_finder(grid, 'G')
-        print("Goal location: ", g_loc)
+        # print("Goal location: ", g_loc)
 
-        return_grid = a_star_b(grid, s_loc, g_loc)
-        print_matrix(return_grid)
-        writer(output_filename, return_grid)
+        return_grid_greedy = greedy_b(grid, s_loc, g_loc)
+        # print_matrix(return_grid_greedy)
+
+        return_grid_a_star = a_star_b(grid, s_loc, g_loc)
+        # print_matrix(return_grid_s_star)
+
+        writer(output_filename, 'Greedy', return_grid_greedy, 'A*', return_grid_a_star)
 
     print('=========== END ============')
-    
+
 
 def reader(filename):
     return_grid = []
@@ -55,10 +63,14 @@ def reader(filename):
     return return_grid
     
 
-def writer(filename, grid):
+def writer(filename, grid1_name, grid1, grid2_name, grid2):
     with open(filename, 'w+') as f:
-        for i in grid:
+        f.write(grid1_name + '\n')
+        for i in grid1:
             f.write(''.join(i) + '\n')
+        f.write(grid2_name + '\n')
+        for j in grid2:
+            f.write(''.join(j) + '\n')
 
 
 def target_finder(grid, target):
@@ -71,14 +83,14 @@ def target_finder(grid, target):
     return location
 
 
-#Will be used to find the h values for up down left right searches
+# Will be used to find the h values for up down left right searches
 # a - x/y of current
 # b - x/y of goal
 def manhattan(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-#Will be used to find the h values for up down left right and diagonals
+# Will be used to find the h values for up down left right and diagonals
 def cheb(a, b):
 
     return max(abs(a[0] - b[0]), abs(a[1] - b[1]))
@@ -280,9 +292,7 @@ def greedy_a(tmp_grid, s_loc, g_loc):
     prev_dir = "None"
     stuck = False
     while (not(stuck)):
-        print("\n")
         for x in a_grid:
-            print(''.join(x))
         left_dist = math.inf
         right_dist = math.inf
         up_dist = math.inf
@@ -317,9 +327,7 @@ def greedy_a(tmp_grid, s_loc, g_loc):
             return False
 
         if (not(stuck)):
-            # TODO: Improve the checking for None values before min check
             min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist])#min(up_dist, down_dist, left_dist, right_dist)
-            #print("Previous direction was %s" % prev_dir)
             if (prev_dir == "Down" and min_index == 0):
                 return False 
             if (prev_dir == "Up" and min_index == 1):
@@ -361,9 +369,7 @@ def greedy_b(tmp_grid, s_loc, g_loc):
     prev_dir = "None"
     stuck = False
     while (not(stuck)):
-        print("\n")
         for x in a_grid:
-            print(''.join(x))
         left_dist = math.inf
         right_dist = math.inf
         up_dist = math.inf
