@@ -1,1 +1,3 @@
+{(A,MAX),(B,MIN),(C,MIN),(H,MIN),(D,MAX),(E,MAX),(F,MAX),(G,MAX),(I,MAX),(J,MAX)} {(A,B),(A,C),(A,H),(B,D),(B,E),(C,F),(C,G),(H,I),(H,J),(D,4),(D,6),(E,7),(E,9),(F,1),(F,2),(G,0),(G,1),(I,8),(I,1),(J,9),(J,2)}
+
 {(A,MAX),(B,MIN),(C,MIN),(D,MAX),(E,MAX),(F,MAX),(G,MAX)} {(A,B),(A,C),(B,D),(B,E),(C,F),(C,G),(D,4),(D,3),(E,2),(E,7),(F,3),(F,2),(G,2),(G,8)}

@@ -1,4 +1,4 @@
-import re
+import re #reeeeeeeeeeeeeeeeeeeeeeee
 import copy
 import math
 import random
@@ -26,9 +26,9 @@ def main():
 
     # Part 2
     alphabeta()
-    return_grid = greedy_b(grid, s_loc, g_loc)
+    #return_grid = greedy_b(grid, s_loc, g_loc)
     #print(return_grid)
-    writer(output_filename, return_grid)
+    #writer(output_filename, return_grid)
 
     print('=========== END ============')
     
@@ -522,21 +522,26 @@ def randomMinIndex(array):
 def alphabeta():
     input_filename = "alphabeta.txt"
     output_filename = "alphabeta_out.txt"
-    alphabeta_reader(input_filename)
+    tree_and_root = alphabeta_reader(input_filename)
+    value_and_examined = tree_and_root[0][tree_and_root[1]].alpha_beta(-math.inf, math.inf) 
+    print("The max value of the tree is %s" % value_and_examined[0] + " and %s leaf nodes were examined" % value_and_examined[1])
 
 
 def alphabeta_reader(input_filename):
     temp_base = {}
+    root = None
     with open(input_filename) as f:
-        for i in f.readlines():
-            if (not(i[0] == " ")):
+        for i in f:#f.readlines():
+            if (not(i == '\n' or i == '')):
                 temp_input01 = i.split(' ')
                 print(temp_input01)
                 t_part01 = temp_input01[0]
                 t_part01 = t_part01[2:-2].split('),(')
                 print(t_part01)
                 t_part02 = temp_input01[1]
-                t_part02 = t_part02[2:-2].split('),(')
+                t_part02 = re.search('{(.+?)}', t_part02).group(1)
+                print(t_part02)
+                t_part02 = t_part02[1:-1].split('),(')
                 print(t_part02)
                 
                 # building base
@@ -551,6 +556,8 @@ def alphabeta_reader(input_filename):
                     print("testing the dic = ", temp_base[t_letter].min)
                 
                 # building children
+                if len(t_part02) > 0:
+                    root = t_part02[0].split(',')[0]
                 for k in t_part02:
                     t_node = k.split(',')
                     t_fletter = t_node[0]
@@ -563,9 +570,12 @@ def alphabeta_reader(input_filename):
                         some_node.childrenSetter(temp_base[t_sletter])
                     else:
                         # assume that its numeric
+                        chars = list(t_sletter)
+                        if chars[len(chars) - 1] == ')':
+                            del chars[len(chars) - 1]
+                        t_sletter = ''.join(chars)
                         some_node.valueSetter(int(t_sletter))
-
-                
+        
     for x in temp_base:
         print('----------')
         print("Letter = ", temp_base[x].letter)
@@ -576,7 +586,7 @@ def alphabeta_reader(input_filename):
             print("\t", y)
         print("Children length = ", len(temp_base[x].children))
                 
-
+    return (temp_base, root)
 
 class Node:
     node_count = 0
@@ -593,6 +603,50 @@ class Node:
     
     def childrenSetter(self, value):
         self.children.append(value)
+
+    def alpha_beta(self, a, b):
+        print("\nNode %s" % self.letter)
+        print("Min: %s" % self.min)
+        print("Alpha: %s" % a + "\nBeta: %s" % b)
+        examined = 0
+        if(len(self.children) == 0):
+            for x in self.values:
+                examined += 1
+                if x > a:
+                    a = x
+                if x > b:
+                    return (a, examined)
+            return (a, examined)
+        else:
+            if self.min:
+                for child in self.children:
+                    childValue = child.alpha_beta(a, b)
+                    best = childValue[0]
+                    examined += childValue[1]
+                    if best <= a:
+                        print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than beta %s" % b)
+                        b = best
+                        return (b, examined)
+                    if best < b:
+                        print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than beta %s" % b)
+                        b = best
+                        #return (b, examined)
+                return (b, examined)
+            else:
+                print("Max node")
+                for child in self.children:
+                    childValue = child.alpha_beta(a, b)
+                    best = childValue[0]
+                    examined += childValue[1]
+                    if best >= b:
+                        print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than alpha %s" % a)
+                        return (a, examined)
+                    if best > a:
+                        print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than alpha %s" % a)
+                        a = best
+                return (a, examined)
+
+
 
     def displayCount(self):
      print ("Total Nodes = %d" % Node.node_count)
