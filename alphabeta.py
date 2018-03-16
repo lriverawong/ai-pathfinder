@@ -16,7 +16,6 @@ def alphabeta():
             value_and_examined = tree_and_root[0][tree_and_root[1]].alpha_beta(-math.inf, math.inf)
             outString = "Graph %s" %count + ": Score: %s" % value_and_examined[0] + "; Leaf Nodes Examined: %s" % value_and_examined[1]
             outFile.write(outString + "\n")
-            print(outString)
 
 
 def alphabeta_reader(line):
@@ -72,9 +71,6 @@ class Node:
         self.children.append(value)
 
     def alpha_beta(self, a, b):
-        print("\nNode %s" % self.letter)
-        print("Min: %s" % self.min)
-        print("Alpha: %s" % a + "\nBeta: %s" % b)
         examined = 0
         if(len(self.children) == 0):
             if self.min:
@@ -82,7 +78,6 @@ class Node:
                     examined += 1
                     b = min(b, x)
                     if b <= a:
-                        print("\nNode: %s" % self.letter + "\nBeta %s" % b + " is better than alpha %s" % a)
                         return (b, examined)
                 return (b,examined)
             else:
@@ -90,7 +85,6 @@ class Node:
                     examined += 1
                     a = max(a, x)
                     if a >= b:
-                        print("\nNode: %s" % self.letter + "\nAlpha %s" % a + " is better than beta %s" % b)
                         return (a, examined)
                 return (a, examined)
         else:
@@ -101,18 +95,15 @@ class Node:
                     examined += childValue[1]
                     b = min(b, best)
                     if b <= a:
-                        print("\nNode: %s" % self.letter + "\nBeta %s" % b + " is better than alpha %s" % a)
                         return (b, examined)
                 return (b, examined)
             else:
-                print("Max node")
                 for child in self.children:
                     childValue = child.alpha_beta(a, b)
                     best = childValue[0]
                     examined += childValue[1]
                     a = max(a, best)
                     if a >= b:
-                        print("\nNode: %s" % self.letter + "\nAlpha %s" % a + " is better than beta %s" % b)
                         return (a, examined)
                 return (a, examined)
         
