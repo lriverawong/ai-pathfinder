@@ -93,45 +93,48 @@ class Node:
         self.children.append(value)
 
     def alpha_beta(self, a, b):
-        #print("\nNode %s" % self.letter)
-        #print("Min: %s" % self.min)
-        #print("Alpha: %s" % a + "\nBeta: %s" % b)
+        print("\nNode %s" % self.letter)
+        print("Min: %s" % self.min)
+        print("Alpha: %s" % a + "\nBeta: %s" % b)
         examined = 0
         if(len(self.children) == 0):
-            for x in self.values:
-                examined += 1
-                if x > a:
-                    a = x
-                if x > b:
-                    return (a, examined)
-            return (a, examined)
+            if self.min:
+                for x in self.values:
+                    examined += 1
+                    b = min(b, x)
+                    if b <= a:
+                        print("\nNode: %s" % self.letter + "\nBeta %s" % b + " is better than alpha %s" % a)
+                        return (b, examined)
+                return (b,examined)
+            else:
+                for x in self.values:
+                    examined += 1
+                    a = max(a, x)
+                    if a >= b:
+                        print("\nNode: %s" % self.letter + "\nAlpha %s" % a + " is better than beta %s" % b)
+                        return (a, examined)
+                return (a, examined)
         else:
             if self.min:
                 for child in self.children:
                     childValue = child.alpha_beta(a, b)
                     best = childValue[0]
                     examined += childValue[1]
-                    if best <= a:
-                        #print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than beta %s" % b)
-                        b = best
+                    b = min(b, best)
+                    if b <= a:
+                        print("\nNode: %s" % self.letter + "\nBeta %s" % b + " is better than alpha %s" % a)
                         return (b, examined)
-                    if best < b:
-                        #print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than beta %s" % b)
-                        b = best
-                        #return (b, examined)
                 return (b, examined)
             else:
-                #print("Max node")
+                print("Max node")
                 for child in self.children:
                     childValue = child.alpha_beta(a, b)
                     best = childValue[0]
                     examined += childValue[1]
-                    if best >= b:
-                        #print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than alpha %s" % a)
+                    a = max(a, best)
+                    if a >= b:
+                        print("\nNode: %s" % self.letter + "\nAlpha %s" % a + " is better than beta %s" % b)
                         return (a, examined)
-                    if best > a:
-                        #print("\nNode: %s" % self.letter + "\nBest %s" % best + " is better than alpha %s" % a)
-                        a = best
                 return (a, examined)
 
 
