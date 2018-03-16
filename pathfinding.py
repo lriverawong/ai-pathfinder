@@ -16,7 +16,7 @@ def main():
     if (run_part01a):
         filename = 'pathfinding_a.txt'
         grid = reader(filename)
-        output_filename = 'output.txt'
+        output_filename = 'pathfinding_a_out.txt'
 
         s_loc = target_finder(grid, 'S')
         print("Starting location: ", s_loc)
@@ -30,7 +30,7 @@ def main():
     if (run_part01b):
         filename = 'pathfinding_a.txt'
         grid = reader(filename)
-        output_filename = 'output.txt'
+        output_filename = 'pathfinding_a_out.txt'
 
         s_loc = target_finder(grid, 'S')
         print("Starting location: ", s_loc)
