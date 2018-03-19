@@ -11,15 +11,15 @@ def main():
     if (run_part01a):
         input_filename = 'pathfinding_a.txt'
         output_filename = 'pathfinding_a_out.txt'
-        reader(input_filename, output_filename)
+        reader(input_filename, output_filename, 'a')
     
     if (run_part01b):
         input_filename = 'pathfinding_b.txt'
         output_filename = 'pathfinding_b_out.txt'
-        reader(input_filename, output_filename)
+        reader(input_filename, output_filename, 'b')
 
 
-def reader(input_file, output_file):
+def reader(input_file, output_file, version):
     with open(input_file) as file:
         single_grid = []
         for line in file:
@@ -31,14 +31,24 @@ def reader(input_file, output_file):
             if (line == '\n' or line == ''):
                 s_loc = target_finder(single_grid, 'S')
                 g_loc = target_finder(single_grid, 'G')
-                return_grid_greedy = greedy_a(single_grid, s_loc, g_loc)
-                return_grid_a_star = a_star_a(single_grid, s_loc, g_loc)
+
+                if(version == 'a'):
+                    return_grid_greedy = greedy_a(single_grid, s_loc, g_loc)
+                    return_grid_a_star = a_star_a(single_grid, s_loc, g_loc)
+                else:
+                    return_grid_greedy = greedy_b(single_grid, s_loc, g_loc)
+                    return_grid_a_star = a_star_b(single_grid, s_loc, g_loc)
+
                 writer(output_file, 'Greedy', return_grid_greedy, 'A*', return_grid_a_star)
                 single_grid = []
         s_loc = target_finder(single_grid, 'S')
         g_loc = target_finder(single_grid, 'G')
-        return_grid_greedy = greedy_a(single_grid, s_loc, g_loc)
-        return_grid_a_star = a_star_a(single_grid, s_loc, g_loc)
+        if(version == 'a'):
+            return_grid_greedy = greedy_a(single_grid, s_loc, g_loc)
+            return_grid_a_star = a_star_a(single_grid, s_loc, g_loc)
+        else:
+            return_grid_greedy = greedy_b(single_grid, s_loc, g_loc)
+            return_grid_a_star = a_star_b(single_grid, s_loc, g_loc)
         writer(output_file, 'Greedy', return_grid_greedy, 'A*', return_grid_a_star)
         single_grid = []
 
@@ -303,40 +313,40 @@ def greedy_a(tmp_grid, s_loc, g_loc):
 
             if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
                 stuck = True
-                return False
+                return a_grid
 
             if (not(stuck)):
                 min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist])
                 if (prev_dir == "Down" and min_index == 0):
-                    return False 
+                    return a_grid
                 if (prev_dir == "Up" and min_index == 1):
-                    return False 
+                    return a_grid
                 if (prev_dir == "Right" and min_index == 2):
-                    return False 
+                    return a_grid 
                 if (prev_dir == "Left" and min_index == 3):
-                    return False 
+                    return a_grid 
 
                 if (min_index == 2):
                     if (prev_dir == "Right"):
-                        return False
+                        return a_grid
                     prev_dir = "Left"
                     curr_loc[1] -= 1
                     a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 elif (min_index == 3):
                     if (prev_dir == "Left"):
-                        return False
+                        return a_grid
                     prev_dir = "Right"
                     curr_loc[1] += 1
                     a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 elif (min_index == 0):
                     if (prev_dir == "Down"):
-                        return False
+                        return a_grid
                     prev_dir = "Up"
                     curr_loc[0] -= 1
                     a_grid[curr_loc[0]][curr_loc[1]] = 'P'
                 elif (min_index == 1):
                     if (prev_dir == "Up"):
-                        return False
+                        return a_grid
                     prev_dir = "Down"
                     curr_loc[0] += 1
                     a_grid[curr_loc[0]][curr_loc[1]] = 'P'
@@ -417,18 +427,18 @@ def greedy_b(tmp_grid, s_loc, g_loc):
 
             if (left_dist == math.inf and right_dist == math.inf and up_dist == math.inf and down_dist == math.inf):
                 stuck = True
-                return False
+                return a_grid
 
             if (not(stuck)):
                 min_index = randomMinIndex([up_dist, down_dist, left_dist, right_dist, up_right_dist, up_left_dist, down_right_dist, down_left_dist])
                 if (prev_dir == "Down" and min_index == 0):
-                    return False 
+                    return a_grid
                 if (prev_dir == "Up" and min_index == 1):
-                    return False 
+                    return a_grid 
                 if (prev_dir == "Right" and min_index == 2):
-                    return False 
+                    return a_grid 
                 if (prev_dir == "Left" and min_index == 3):
-                    return False 
+                    return a_grid 
 
                 #Diagonal Directions
                 if (min_index == 4):
